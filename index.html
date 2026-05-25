@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎤 芸能人グループクイズ道場</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700;900&family=Noto+Sans+JP:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://pecpec37-gift.github.io/portal/stamp.js"></script>
+<style>
+:root {
+  --bg:#0d0a1a;--bg2:#13102a;--bg3:#1a1535;
+  --surface:#1e1a38;--surface2:#28224a;
+  --border:rgba(160,120,255,0.18);
+  --purple:#7c3aed;--purple2:#a78bfa;--purple3:#ddd6fe;
+  --pink:#ec4899;--pink2:#f9a8d4;
+  --gold:#f59e0b;--gold2:#fde68a;
+  --green:#10b981;--red:#ef4444;
+  --text:#f0eaff;--text2:rgba(240,234,255,0.7);--text3:rgba(240,234,255,0.4);
+  --radius:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 15% 15%,rgba(124,58,237,0.12) 0%,transparent 55%),radial-gradient(ellipse at 85% 85%,rgba(236,72,153,0.08) 0%,transparent 55%);pointer-events:none;z-index:0;}
+
+.screen{display:none;position:relative;z-index:1;}
+.screen.active{display:block;}
+
+/* TOP */
+#screen-top{min-height:100vh;}
+.top-hero{background:linear-gradient(160deg,#1a1040 0%,#0d0a1a 60%);padding:52px 24px 44px;text-align:center;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+.top-hero::before{content:'🎤';position:absolute;left:-20px;bottom:-20px;font-size:180px;opacity:0.035;pointer-events:none;}
+.top-hero::after{content:'✨';position:absolute;right:0;top:0;font-size:140px;opacity:0.04;pointer-events:none;}
+.top-eyebrow{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.22em;color:var(--purple2);text-transform:uppercase;margin-bottom:12px;}
+.top-title{font-family:'Zen Kaku Gothic New',sans-serif;font-weight:900;font-size:clamp(32px,7vw,60px);line-height:1.1;color:var(--text);margin-bottom:8px;}
+.top-title span{background:linear-gradient(90deg,var(--purple2),var(--pink2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.top-sub{font-size:13px;color:var(--text2);letter-spacing:0.06em;margin-bottom:28px;}
+.top-rule{display:inline-block;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);border-radius:6px;padding:14px 20px;text-align:left;font-size:12px;line-height:2;color:var(--text2);}
+.top-rule strong{color:var(--purple3);}
+
+.genres-wrap{max-width:900px;margin:0 auto;padding:32px 20px 20px;}
+.genres-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+.genres-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.genres-hint{font-size:12px;color:var(--purple2);background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.2);border-radius:4px;padding:8px 14px;margin-bottom:20px;text-align:center;letter-spacing:0.04em;}
+.genres-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:24px;}
+.genre-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 18px;cursor:pointer;transition:transform 0.12s,box-shadow 0.12s,border-color 0.12s;position:relative;overflow:hidden;}
+.genre-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,58,237,0.08),transparent);opacity:0;transition:opacity 0.15s;}
+.genre-card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,0.5);border-color:rgba(124,58,237,0.5);}
+.genre-card:hover::before{opacity:1;}
+.genre-card:active{transform:translateY(0);}
+.genre-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:8px 8px 0 0;}
+.genre-icon{font-size:30px;line-height:1;margin-bottom:8px;display:block;}
+.genre-name{font-family:'Zen Kaku Gothic New',sans-serif;font-weight:900;font-size:17px;margin-bottom:3px;color:var(--text);}
+.genre-member{font-size:11px;color:var(--text3);margin-bottom:4px;line-height:1.6;}
+.genre-count{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:0.1em;}
+.genre-start{position:absolute;top:14px;right:14px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.1em;color:var(--purple2);opacity:0;transition:opacity 0.15s;}
+.genre-card:hover .genre-start{opacity:1;}
+
+.ranking-btn-wrap{text-align:center;padding:8px 0 36px;}
+.ranking-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.12em;padding:10px 24px;background:none;border:1px solid var(--border);color:var(--text3);border-radius:3px;cursor:pointer;transition:all 0.15s;}
+.ranking-btn:hover{border-color:var(--purple2);color:var(--purple2);}
+
+/* INTRO */
+#screen-intro{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;}
+#screen-intro.active{display:flex;}
+.intro-box{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:32px 28px;width:100%;max-width:420px;text-align:center;}
+.intro-genre-icon{font-size:52px;margin-bottom:10px;display:block;}
+.intro-genre-name{font-family:'Zen Kaku Gothic New',sans-serif;font-weight:900;font-size:24px;margin-bottom:4px;}
+.intro-genre-members{font-size:12px;color:var(--text3);margin-bottom:20px;line-height:1.7;}
+.intro-rule{font-size:12px;line-height:1.9;color:var(--text2);text-align:left;background:rgba(124,58,237,0.07);border-radius:6px;padding:12px 14px;margin-bottom:20px;}
+.intro-rule strong{color:var(--purple3);}
+.name-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.18em;color:var(--text3);text-transform:uppercase;margin-bottom:6px;text-align:left;}
+.name-input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px 14px;color:var(--text);font-family:'Noto Sans JP',sans-serif;font-size:14px;margin-bottom:16px;outline:none;transition:border-color 0.15s;}
+.name-input:focus{border-color:var(--purple2);}
+.name-input::placeholder{color:var(--text3);}
+.start-btn{width:100%;padding:14px;background:linear-gradient(90deg,var(--purple),var(--pink));color:white;font-family:'Zen Kaku Gothic New',sans-serif;font-weight:900;font-size:16px;border:none;border-radius:6px;cursor:pointer;transition:opacity 0.15s,transform 0.1s;letter-spacing:0.04em;}
+.start-btn:hover{opacity:0.9;}
+.start-btn:active{transform:scale(0.98);}
+.back-link{margin-top:14px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);cursor:pointer;transition:color 0.15s;background:none;border:none;}
+.back-link:hover{color:var(--text);}
+
+/* QUIZ */
+#screen-quiz{min-height:100vh;}
+.quiz-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:10;}
+.quiz-progress{flex:1;height:3px;background:rgba(124,58,237,0.15);border-radius:2px;overflow:hidden;min-width:60px;}
+.quiz-progress-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:2px;transition:width 0.3s;}
+.quiz-qnum{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);white-space:nowrap;letter-spacing:0.08em;}
+.quiz-score{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--purple3);white-space:nowrap;}
+.quiz-timer-wrap{display:flex;align-items:center;gap:5px;}
+.quiz-timer{font-family:'Zen Kaku Gothic New',sans-serif;font-weight:900;font-size:22px;color:var(--purple3);min-width:40px;text-align:right;transition:color 0.3s;}
+.quiz-timer.danger{color:#ef4444;animation:pulse 0.5s infinite alternate;}
+@keyframes pulse{from{opacity:1;}to{opacity:0.5;}}
+.quiz-timer-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:0.1em;}
+
+.quiz-body{max-width:640px;margin:0 auto;padding:28px 20px 40px;}
+.quiz-type-badge{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.16em;padding:3px 10px;border-radius:3px;display:inline-block;margin-bottom:14px;text-transform:uppercase;}
+.quiz-type-badge.type-4{background:rgba(124,58,237,0.15);color:var(--purple2);}
+.quiz-type-badge.type-ox{background:rgba(16,185,129,0.15);color:#34d399;}
+.quiz-q{font-family:'Zen Kaku Gothic New',sans-serif;font-weight:700;font-size:clamp(16px,4vw,20px);line-height:1.65;margin-bottom:22px;color:var(--text);}
+.choices{display:flex;flex-direction:column;gap:10px;}
+.choice-btn{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;text-align:left;font-family:'Noto Sans JP',sans-serif;font-size:14px;color:var(--text);cursor:pointer;transition:all 0.12s;display:flex;align-items:center;gap:12px;}
+.choice-btn:hover:not(:disabled){background:var(--surface2);border-color:rgba(124,58,237,0.5);transform:translateX(4px);}
+.choice-btn:disabled{cursor:default;}
+.choice-btn.correct{background:rgba(16,185,129,0.15);border-color:#10b981;color:#34d399;}
+.choice-btn.wrong{background:rgba(239,68,68,0.12);border-color:#ef4444;color:#f87171;}
+.choice-label{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);min-width:20px;}
+.ox-choices{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.ox-btn{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 16px;font-size:38px;cursor:pointer;transition:all 0.12s;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;}
+.ox-btn span{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:0.1em;}
+.ox-btn:hover:not(:disabled){transform:scale(1.03);border-color:rgba(124,58,237,0.5);}
+.ox-btn:disabled{cursor:default;}
+.ox-btn.correct{background:rgba(16,185,129,0.15);border-color:#10b981;}
+.ox-btn.wrong{background:rgba(239,68,68,0.12);border-color:#ef4444;}
+
+.feedback-bar{margin-top:14px;padding:12px 16px;border-radius:6px;font-size:13px;font-weight:700;opacity:0;transition:opacity 0.2s;min-height:44px;}
+.feedback-bar.show{opacity:1;}
+.feedback-bar.ok{background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.3);}
+.feedback-bar.ng{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.25);}
+.next-btn{margin-top:14px;width:100%;padding:12px;background:linear-gradient(90deg,var(--purple),var(--pink));color:white;font-family:'Zen Kaku Gothic New',sans-serif;font-weight:900;font-size:15px;border:none;border-radius:6px;cursor:pointer;transition:opacity 0.15s;display:none;}
+.next-btn.show{display:block;}
+.next-btn:hover{opacity:0.88;}
+
+/* RESULT */
+#screen-result{min-height:100vh;display:none;flex-direction:column;align-items:center;padding:40px 20px 60px;}
+#screen-result.active{display:flex;}
+.result-box{width:100%;max-width:520px;}
+.result-genre{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--text3);text-transform:uppercase;margin-bottom:8px;text-align:center;}
+.result-score-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:28px;text-align:center;margin-bottom:20px;}
+.result-medal{font-size:48px;margin-bottom:8px;display:block;}
+.result-score{font-family:'Zen Kaku Gothic New',sans-serif;font-weight:900;font-size:64px;line-height:1;background:linear-gradient(90deg,var(--purple2),var(--pink2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.result-score-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.16em;color:var(--text3);margin-bottom:16px;text-transform:uppercase;}
+.result-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px;}
+.result-stat{background:var(--bg2);border-radius:6px;padding:12px 8px;text-align:center;}
+.result-stat-val{font-family:'Zen Kaku Gothic New',sans-serif;font-weight:900;font-size:24px;color:var(--purple3);}
+.result-stat-val.green{color:#34d399;}
+.result-stat-val.blue{color:#60a5fa;}
+.result-stat-label{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.1em;color:var(--text3);margin-top:2px;}
+.result-actions{display:flex;gap:10px;margin-bottom:24px;}
+.result-btn{flex:1;padding:12px;font-family:'Zen Kaku Gothic New',sans-serif;font-weight:700;font-size:14px;border-radius:6px;cursor:pointer;transition:all 0.15s;}
+.result-btn-primary{background:linear-gradient(90deg,var(--purple),var(--pink));color:white;border:none;}
+.result-btn-primary:hover{opacity:0.88;}
+.result-btn-secondary{background:none;color:var(--text2);border:1px solid var(--border);}
+.result-btn-secondary:hover{border-color:var(--purple2);color:var(--purple2);}
+
+.wrong-section{width:100%;max-width:520px;}
+.wrong-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.18em;color:var(--text3);text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.wrong-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:10px;}
+.wrong-item-num{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.14em;color:var(--text3);margin-bottom:6px;}
+.wrong-item-q{font-size:14px;line-height:1.6;color:var(--text);margin-bottom:10px;font-weight:700;}
+.wrong-item-ans{display:flex;align-items:flex-start;gap:8px;font-size:13px;}
+.wrong-item-ans-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--green);background:rgba(16,185,129,0.12);padding:2px 7px;border-radius:2px;white-space:nowrap;margin-top:1px;}
+.wrong-item-ans-text{color:#34d399;line-height:1.5;}
+.portal-back{display:block;text-align:center;margin-top:28px;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.1em;color:var(--text3);text-decoration:none;padding:10px 20px;border:1px solid var(--border);border-radius:3px;transition:all 0.15s;}
+.portal-back:hover{border-color:var(--purple2);color:var(--purple2);}
+
+/* RANKING */
+#screen-ranking{min-height:100vh;padding:40px 20px 60px;}
+.ranking-wrap{max-width:600px;margin:0 auto;}
+.ranking-top{display:flex;align-items:center;gap:12px;margin-bottom:24px;}
+.ranking-title{font-family:'Zen Kaku Gothic New',sans-serif;font-weight:900;font-size:22px;background:linear-gradient(90deg,var(--purple2),var(--pink2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex:1;}
+.ranking-back{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);background:none;border:1px solid var(--border);border-radius:3px;padding:6px 14px;cursor:pointer;transition:all 0.15s;}
+.ranking-back:hover{border-color:var(--purple2);color:var(--purple2);}
+.ranking-tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin-bottom:20px;border-bottom:1px solid var(--border);}
+.ranking-tabs::-webkit-scrollbar{display:none;}
+.ranking-tab{flex-shrink:0;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.1em;padding:10px 12px;background:none;border:none;border-bottom:2px solid transparent;color:var(--text3);cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.ranking-tab.active{color:var(--purple2);border-bottom-color:var(--purple2);}
+.ranking-list{display:flex;flex-direction:column;gap:6px;}
+.ranking-empty{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);text-align:center;padding:32px;letter-spacing:0.1em;}
+.ranking-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 16px;}
+.ranking-row.top1{border-color:rgba(245,158,11,0.5);background:rgba(245,158,11,0.06);}
+.ranking-row.top2{border-color:rgba(200,200,200,0.3);background:rgba(200,200,200,0.03);}
+.ranking-row.top3{border-color:rgba(200,130,50,0.3);background:rgba(200,130,50,0.04);}
+.ranking-pos{font-family:'Zen Kaku Gothic New',sans-serif;font-weight:900;font-size:18px;min-width:28px;color:var(--text3);}
+.ranking-pos.gold{color:#f59e0b;}
+.ranking-pos.silver{color:#9ca3af;}
+.ranking-pos.bronze{color:#b45309;}
+.ranking-name{flex:1;font-size:14px;font-weight:700;color:var(--text);}
+.ranking-score{font-family:'Zen Kaku Gothic New',sans-serif;font-weight:900;font-size:20px;color:var(--purple3);}
+.ranking-date{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text3);margin-left:6px;}
+.ranking-del{font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:4px 8px;margin-top:12px;font-family:'Share Tech Mono',monospace;letter-spacing:0.08em;transition:color 0.15s;}
+.ranking-del:hover{color:#ef4444;}
+
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg2);color:var(--purple3);font-family:'Share Tech Mono',monospace;font-size:12px;padding:10px 20px;border-radius:6px;border:1px solid var(--purple);z-index:9999;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+.portal-fixed-btn{position:fixed;bottom:20px;left:20px;z-index:9999;display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:rgba(13,10,26,0.92);color:var(--purple3);font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:0.08em;border-radius:4px;border:1px solid rgba(124,58,237,0.35);text-decoration:none;backdrop-filter:blur(6px);box-shadow:0 4px 16px rgba(0,0,0,0.5);transition:all 0.15s;white-space:nowrap;}
+.portal-fixed-btn:hover{background:rgba(13,10,26,0.98);border-color:rgba(124,58,237,0.7);transform:translateY(-1px);}
+
+@media(max-width:480px){
+  .genres-grid{grid-template-columns:1fr 1fr;}
+  .result-actions{flex-direction:column;}
+  .portal-fixed-btn{bottom:14px;left:14px;padding:8px 14px;font-size:11px;}
+}
+</style>
+</head>
+<body>
+
+<div id="screen-top" class="screen active">
+  <div class="top-hero">
+    <div class="top-eyebrow">Tommy's Quiz Dojo</div>
+    <h1 class="top-title">芸能人<span>グループ</span>クイズ道場</h1>
+    <p class="top-sub">2026年人気グループのメンバー・楽曲・エピソードを学ぼう！</p>
+    <div class="top-rule">
+      📋 制限時間：<strong>120秒</strong> ／ 各グループ<strong>10問</strong>ランダム出題<br>
+      ✅ 正解 → <strong>+10点</strong> ＋ 時間+5秒<br>
+      ❌ 不正解 → 減点なし ＋ 時間−5秒のペナルティ<br>
+      🏆 残り時間がそのままボーナス点に加算！<br>
+      【4択】と【○×】がランダムにミックスされます
+    </div>
+  </div>
+  <div class="genres-wrap">
+    <div class="genres-label">// グループを選んでスタート</div>
+    <div class="genres-hint">👆 カードをクリックするとすぐに始められます</div>
+    <div class="genres-grid" id="genres-grid"></div>
+    <div class="ranking-btn-wrap">
+      <button class="ranking-btn" onclick="showRanking()">🏆 スコアランキングを見る</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-intro" class="screen">
+  <div class="intro-box">
+    <span class="intro-genre-icon" id="intro-icon"></span>
+    <div class="intro-genre-name" id="intro-name"></div>
+    <div class="intro-genre-members" id="intro-members"></div>
+    <div class="intro-rule">
+      制限時間：<strong>120秒</strong> ／ 10問ランダム出題（4択＋○×ミックス）<br>
+      ✅ 正解 → <strong>+10点</strong> ＋ 時間+5秒<br>
+      ❌ 不正解 → 減点なし ＋ 時間−5秒<br>
+      🏆 残り時間がそのままボーナス点に加算
+    </div>
+    <div class="name-label">// Your Name（ランキングに表示）</div>
+    <input class="name-input" id="name-input" type="text" maxlength="20" placeholder="プレーヤー名（任意）">
+    <button class="start-btn" onclick="startGame()">スタート ▶</button>
+    <button class="back-link" onclick="showScreen('screen-top')">← 戻る</button>
+  </div>
+</div>
+
+<div id="screen-quiz" class="screen">
+  <div class="quiz-header">
+    <div class="quiz-qnum" id="quiz-qnum">Q1 / 10</div>
+    <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill" style="width:0%"></div></div>
+    <div class="quiz-score" id="quiz-score">0 pt</div>
+    <div class="quiz-timer-wrap">
+      <div class="quiz-timer" id="quiz-timer">120</div>
+      <div class="quiz-timer-label">秒</div>
+    </div>
+  </div>
+  <div class="quiz-body">
+    <div class="quiz-type-badge" id="quiz-type-badge">4択</div>
+    <div class="quiz-q" id="quiz-q"></div>
+    <div id="quiz-choices"></div>
+    <div class="feedback-bar" id="feedback-bar"></div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">次の問題へ →</button>
+  </div>
+</div>
+
+<div id="screen-result" class="screen">
+  <div class="result-box">
+    <div class="result-genre" id="result-genre"></div>
+    <div class="result-score-wrap">
+      <span class="result-medal" id="result-medal">🏆</span>
+      <div class="result-score" id="result-score">0</div>
+      <div class="result-score-label">TOTAL SCORE</div>
+      <div class="result-stats">
+        <div class="result-stat"><div class="result-stat-val green" id="result-correct">0</div><div class="result-stat-label">正解数</div></div>
+        <div class="result-stat"><div class="result-stat-val" id="result-wrong">0</div><div class="result-stat-label">不正解数</div></div>
+        <div class="result-stat"><div class="result-stat-val blue" id="result-bonus">+0</div><div class="result-stat-label">時間ボーナス</div></div>
+      </div>
+    </div>
+    <div class="result-actions">
+      <button class="result-btn result-btn-primary" onclick="retryGame()">もう一度挑戦</button>
+      <button class="result-btn result-btn-secondary" onclick="showScreen('screen-top')">← トップへ</button>
+    </div>
+  </div>
+  <div class="wrong-section" id="wrong-section"></div>
+  <a class="portal-back" href="https://pecpec37-gift.github.io/portal/">← とみやんのゲームランド</a>
+</div>
+
+<div id="screen-ranking" class="screen">
+  <div class="ranking-wrap">
+    <div class="ranking-top">
+      <div class="ranking-title">🏆 スコアランキング</div>
+      <button class="ranking-back" onclick="showScreen('screen-top')">← トップへ</button>
+    </div>
+    <div class="ranking-tabs" id="ranking-tabs"></div>
+    <div class="ranking-list" id="ranking-list"></div>
+    <div style="text-align:center;margin-top:16px;">
+      <button class="ranking-del" id="ranking-del-btn" onclick="deleteRanking()">🗑️ このグループの記録を削除</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<a class="portal-fixed-btn" href="https://pecpec37-gift.github.io/portal/">← とみやんのゲームランド</a>
+
+<script>
+const GENRES = [
+  {id:'arashi',  icon:'🌪️', name:'嵐',            color:'#3b82f6', members:'大野智・櫻井翔・相葉雅紀・二宮和也・松本潤'},
+  {id:'kingpri', icon:'👑', name:'King & Prince', color:'#ec4899', members:'永瀬廉・髙橋海人・岸優太・神宮寺勇太'},
+  {id:'snowman', icon:'⛄', name:'Snow Man',       color:'#60a5fa', members:'岩本照・深澤辰哉・ラウール・渡辺翔太・向井康二・阿部亮平・目黒蓮・宮舘涼太・佐久間大介'},
+  {id:'sixtones',icon:'🎸', name:'SixTONES',      color:'#f59e0b', members:'ジェシー・京本大我・髙地優吾・田中樹・松村北斗・森本慎太郎'},
+  {id:'naniwa',  icon:'🌊', name:'なにわ男子',    color:'#10b981', members:'道枝駿佑・高橋恭平・西畑大吾・大橋和也・藤原丈一郎・長尾謙杜・小島健'},
+  {id:'travis',  icon:'🌏', name:'Travis Japan',  color:'#a78bfa', members:'松田元太・宮近海斗・中村海人・川島如恵留・吉澤閑也・七五三掛龍也・松倉海斗'},
+];
+
+const DB = {
+arashi:[
+  {type:'4',q:'嵐が結成された年はいつか？',c:['1999年','2001年','1997年','2003年'],a:0},
+  {type:'ox',q:'嵐は5人組のグループである。',a:true},
+  {type:'4',q:'嵐のリーダーは誰か？',c:['大野智','櫻井翔','松本潤','相葉雅紀'],a:0},
+  {type:'ox',q:'嵐は2020年末に活動を休止した。',a:true},
+  {type:'4',q:'嵐のデビュー曲はどれか？',c:['A・RA・SHI','Love so sweet','Happiness','Monster'],a:0},
+  {type:'ox',q:'櫻井翔はニュースキャスターとしても活動している。',a:true},
+  {type:'4',q:'嵐の中で映画「花より男子」に出演したメンバーは誰か？',c:['松本潤','二宮和也','大野智','相葉雅紀'],a:0},
+  {type:'ox',q:'相葉雅紀は「VS嵐」の司会を長年務めた。',a:true},
+  {type:'4',q:'嵐が2009年に国立競技場でのコンサートを行った際の動員数として知られるのはどれか？',c:['5万人以上','1万人','2万人','3万人'],a:0},
+  {type:'ox',q:'二宮和也は映画「硫黄島からの手紙」でクリント・イーストウッド監督作品に出演した。',a:true},
+  {type:'4',q:'嵐の楽曲「Happiness」はどんなドラマの主題歌か？',c:['花より男子2','ハナミズキ','マイボス マイヒーロー','ごくせん'],a:2},
+  {type:'ox',q:'大野智はソロで絵画の個展を開催したことがある。',a:true},
+  {type:'4',q:'嵐の「A・RA・SHI」がリリースされた年はいつか？',c:['1999年','2000年','2001年','1998年'],a:0},
+  {type:'ox',q:'松本潤は大河ドラマ「どうする家康」で主演を務めた。',a:true},
+  {type:'4',q:'嵐のメンバーで嵐の中でバレーボールが趣味として知られるのは誰か？',c:['相葉雅紀','大野智','二宮和也','松本潤'],a:0},
+  {type:'ox',q:'嵐はデビューから2019年末まで毎年コンサートツアーを行った。',a:true},
+  {type:'4',q:'嵐が初めて紅白歌合戦に出場した年はいつか？',c:['2009年','2005年','2003年','2007年'],a:0},
+  {type:'ox',q:'嵐の「Love so sweet」は花より男子の主題歌だ。',a:true},
+  {type:'4',q:'嵐が5×20周年コンサートを行った会場はどこか？',c:['国立競技場','東京ドーム','横浜スタジアム','大阪ドーム'],a:0},
+  {type:'ox',q:'二宮和也は「ギルティ 悪魔と契約した女」で主演を務めた。',a:false},
+  {type:'4',q:'嵐の中で釣りを趣味として公言しているメンバーは誰か？',c:['相葉雅紀','大野智','松本潤','二宮和也'],a:0},
+  {type:'ox',q:'嵐は日本国内だけでなくアジアでも高い人気を誇った。',a:true},
+  {type:'4',q:'嵐の楽曲「Monster」はどのタイプの曲か？',c:['ロック調のパワフルな楽曲','バラード','ダンスポップ','アイドルポップ'],a:0},
+  {type:'ox',q:'嵐は活動休止前に年間で最も多くCDを売り上げたジャニーズグループの一つだった。',a:true},
+  {type:'4',q:'櫻井翔が慶應義塾大学で専攻した学部はどこか？',c:['経済学部','法学部','理工学部','文学部'],a:0},
+],
+kingpri:[
+  {type:'4',q:'King & Princeは何人組のグループか（2024年以降）？',c:['4人','3人','5人','6人'],a:0},
+  {type:'ox',q:'King & Princeのデビュー曲は「シンデレラガール」だ。',a:true},
+  {type:'4',q:'King & Princeのデビュー年はいつか？',c:['2018年','2017年','2019年','2020年'],a:0},
+  {type:'ox',q:'永瀬廉は俳優としても活躍しており、ドラマや映画に多数出演している。',a:true},
+  {type:'4',q:'King & Princeのメンバーで誕生日が最も早い（年齢が最も上の）のは誰か？',c:['岸優太','永瀬廉','神宮寺勇太','髙橋海人'],a:0},
+  {type:'ox',q:'髙橋海人はファッションへの関心が高く、雑誌のモデルも務めている。',a:true},
+  {type:'4',q:'King & Princeの「koi-wazurai」はどのジャンルの楽曲か？',c:['和風テイストのポップス','ロック','バラード','EDM'],a:0},
+  {type:'ox',q:'King & Princeは2023年に一部メンバーが脱退し、グループの体制が変わった。',a:true},
+  {type:'4',q:'King & Princeのメンバー永瀬廉が主演したドラマのジャンルとして多いのはどれか？',c:['恋愛ドラマ','時代劇','サスペンス','ホラー'],a:0},
+  {type:'ox',q:'King & Princeのファンクラブ名は「tiara」だ。',a:true},
+  {type:'4',q:'神宮寺勇太の特技として知られるのはどれか？',c:['ピアノ','ダンス','料理','書道'],a:1},
+  {type:'ox',q:'King & Princeは結成当初6人組だった。',a:true},
+  {type:'4',q:'King & Princeの「Magic Touch」はどのような楽曲か？',c:['アップテンポなダンスナンバー','感動的なバラード','アコースティックな曲','昭和歌謡風'],a:0},
+  {type:'ox',q:'髙橋海人は小説を執筆・出版した経験がある。',a:true},
+  {type:'4',q:'King & Princeで最年少のメンバーは誰か？',c:['永瀬廉','髙橋海人','神宮寺勇太','岸優太'],a:0},
+  {type:'ox',q:'King & Princeのコンサートツアーは毎年ドーム規模で行われている。',a:true},
+  {type:'4',q:'岸優太が出演したドラマで特に話題になったのはどれか？',c:['ドラゴン桜','わたしの一番最悪なともだち','やんごとなき一族','パリピ孔明'],a:0},
+  {type:'ox',q:'King & Princeの「ツキヨミ」はホラー映画のタイアップ曲だ。',a:false},
+  {type:'4',q:'King & Princeのデビューアルバムのタイトルは何か？',c:['King & Prince','Mr.5','Made in','Re:Sense'],a:0},
+  {type:'ox',q:'永瀬廉は韓国語を勉強していることで知られる。',a:true},
+  {type:'4',q:'King & Princeで「ラジオ好き」で知られるのは誰か？',c:['神宮寺勇太','永瀬廉','髙橋海人','岸優太'],a:0},
+  {type:'ox',q:'King & Princeはテレビ番組「King & Prince 1st Tour 2018」をDVD化した。',a:true},
+  {type:'4',q:'King & Princeが初めて単独でドームツアーを行ったのはいつか？',c:['2019年','2020年','2021年','2022年'],a:0},
+  {type:'ox',q:'King & Princeの「I promise」はバレンタイン向けに制作されたバラードだ。',a:true},
+  {type:'4',q:'髙橋海人が執筆した小説のタイトルはどれか？',c:['ねこがさいごにいったこと','猫と月光','ねむれない夜','花と星'],a:0},
+],
+snowman:[
+  {type:'4',q:'Snow Manは何人組のグループか？',c:['9人','7人','8人','6人'],a:0},
+  {type:'ox',q:'Snow Manのデビュー曲は「D.D.」だ。',a:true},
+  {type:'4',q:'Snow Manがデビューしたのはいつか？',c:['2020年','2019年','2021年','2018年'],a:0},
+  {type:'ox',q:'Snow ManはJr.時代から存在したグループで、メンバー変更を経てデビューした。',a:true},
+  {type:'4',q:'Snow Manのメンバーで体操の経歴を持つのは誰か？',c:['岩本照','阿部亮平','渡辺翔太','深澤辰哉'],a:0},
+  {type:'ox',q:'目黒蓮は俳優としてドラマ「Silent」に出演し注目を集めた。',a:true},
+  {type:'4',q:'Snow Manのメンバーで東京大学大学院出身として話題になったのは誰か？',c:['阿部亮平','岩本照','渡辺翔太','宮舘涼太'],a:0},
+  {type:'ox',q:'ラウールはハーフでありダンスが得意なメンバーだ。',a:true},
+  {type:'4',q:'Snow Manの「HELLO HELLO」はどのような楽曲か？',c:['爽やかなポップスナンバー','ヘビーなロック','バラード','ラップ主体の曲'],a:0},
+  {type:'ox',q:'佐久間大介はアニメやゲームが大好きなオタクキャラで知られる。',a:true},
+  {type:'4',q:'Snow Manで最年長のメンバーは誰か？',c:['深澤辰哉','岩本照','宮舘涼太','渡辺翔太'],a:0},
+  {type:'ox',q:'Snow Manはデビュー初日にCDの売上が100万枚を超えた。',a:true},
+  {type:'4',q:'向井康二の出身はどこか？',c:['大阪府','東京都','愛知県','福岡県'],a:0},
+  {type:'ox',q:'Snow ManはYouTubeチャンネルを開設し、さまざまな動画を公開している。',a:true},
+  {type:'4',q:'Snow Manで振付・ダンスリーダー的役割を担うメンバーは誰か？',c:['岩本照','ラウール','目黒蓮','渡辺翔太'],a:0},
+  {type:'ox',q:'渡辺翔太はビジュアル担当として知られている。',a:true},
+  {type:'4',q:'Snow Manの「滝沢歌舞伎」はどんなイベントか？',c:['ジャニーズ伝統の舞台公演','野外コンサート','テレビ番組','映画プロジェクト'],a:0},
+  {type:'ox',q:'阿部亮平はクイズ番組での活躍でも知られている。',a:true},
+  {type:'4',q:'Snow Manメンバーの宮舘涼太が得意とすることはどれか？',c:['料理','絵画','書道','英会話'],a:0},
+  {type:'ox',q:'Snow Manは9人全員が等しくリーダーなしの体制をとっている。',a:false},
+  {type:'4',q:'ラウールのフルネームは何か？',c:['二反田新拓','末澤誠也','宮舘涼太','向井康二'],a:0},
+  {type:'ox',q:'目黒蓮はダンスが得意でSnow Man内でも高い評価を受けている。',a:true},
+  {type:'4',q:'Snow Manの楽曲「Grandeur」はどんなタイプか？',c:['壮大でドラマチックなナンバー','コミカルなキャラクターソング','シンプルなバラード','夏の爽快ポップス'],a:0},
+  {type:'ox',q:'佐久間大介は特撮やアニメのオタクとして有名で、様々なイベントにも参加している。',a:true},
+  {type:'4',q:'Snow Manが初めて単独でドームコンサートを行ったのはいつ頃か？',c:['2022年','2021年','2023年','2020年'],a:0},
+],
+sixtones:[
+  {type:'4',q:'SixTONESは何人組のグループか？',c:['6人','5人','7人','4人'],a:0},
+  {type:'ox',q:'SixTONESはSnow Manと同日にCDデビューした。',a:true},
+  {type:'4',q:'SixTONESのデビュー曲はどれか？',c:['Imitation Rain','Navigator','NEW ERA','JAPONICA STYLE'],a:0},
+  {type:'ox',q:'「Imitation Rain」はYOSHIKI（X JAPAN）が作曲した。',a:true},
+  {type:'4',q:'SixTONESのメンバーでドラマ「消えた初恋」に出演したのは誰か？',c:['目黒蓮','京本大我','松村北斗','髙地優吾'],a:1},
+  {type:'ox',q:'ジェシーの母親はアメリカ人で、英語が堪能だ。',a:true},
+  {type:'4',q:'SixTONESのメンバーで歌舞伎俳優・市川染五郎の息子はだれか？',c:['京本大我','田中樹','森本慎太郎','松村北斗'],a:0},
+  {type:'ox',q:'SixTONESはデビュー前からYouTubeに動画を投稿していた。',a:true},
+  {type:'4',q:'SixTONESの田中樹が得意とするのはどれか？',c:['ラップ','バイオリン','アクロバット','武道'],a:0},
+  {type:'ox',q:'松村北斗は映画や舞台など俳優としての評価が高い。',a:true},
+  {type:'4',q:'SixTONESの「NEW ERA」はどのゲームのタイアップ曲か？',c:['モンスターストライク','パズル&ドラゴンズ','ドラゴンクエスト','ファイナルファンタジー'],a:0},
+  {type:'ox',q:'髙地優吾はバラエティ番組でのキャラクターが人気だ。',a:true},
+  {type:'4',q:'SixTONESのグループ名の由来は何か？',c:['6人の石（stones）という意味','6つのトーン（音）','6人のトーキョーネイティブ','特に意味のない造語'],a:0},
+  {type:'ox',q:'森本慎太郎は映画「ライオン・キング」の日本語吹替でシンバ役を演じた。',a:true},
+  {type:'4',q:'SixTONESの楽曲「JAPONICA STYLE」のコンセプトはどれか？',c:['和風テイスト','西洋クラシック','宇宙','海洋'],a:0},
+  {type:'ox',q:'ジェシーはバラエティでの天然キャラで人気がある。',a:true},
+  {type:'4',q:'SixTONESで最年長のメンバーは誰か？',c:['京本大我','ジェシー','松村北斗','田中樹'],a:0},
+  {type:'ox',q:'SixTONESはSnow Manと合わせて「滝沢歌舞伎」で共演したことがある。',a:true},
+  {type:'4',q:'SixTONESの「Telephone」はどんな雰囲気の楽曲か？',c:['キャッチーでポップなナンバー','ヘビーなロック','和テイスト','哀愁漂うバラード'],a:0},
+  {type:'ox',q:'京本大我の父は歌手・京本政樹だ。',a:true},
+  {type:'4',q:'松村北斗が主演・出演で特に話題になった映画はどれか？',c:['美しい彼','ブラッシュアップライフ','由宇子の天秤','バイオレンスアクション'],a:0},
+  {type:'ox',q:'SixTONESはアルバムでオリコン週間アルバムランキング1位を獲得したことがある。',a:true},
+  {type:'4',q:'SixTONESのメンバーで兵庫県出身者はいるか？（森本慎太郎）',c:['いる（森本慎太郎）','いない','東京出身者しかいない','大阪出身者のみ'],a:0},
+  {type:'ox',q:'田中樹はラジオのパーソナリティとしても活動している。',a:true},
+  {type:'4',q:'SixTONESの「Rosy」はどんな楽曲か？',c:['甘くロマンティックなラブソング','激しいロック','アップテンポなダンスナンバー','コミカルソング'],a:0},
+],
+naniwa:[
+  {type:'4',q:'なにわ男子は何人組のグループか？',c:['7人','5人','6人','8人'],a:0},
+  {type:'ox',q:'なにわ男子は全員が関西ジャニーズJr.出身だ。',a:true},
+  {type:'4',q:'なにわ男子のデビューシングルはどれか？',c:['初心LOVE（うぶらぶ）','ハッピーサプライズ','恋人ごっこ','夢陸'],a:0},
+  {type:'ox',q:'道枝駿佑は子役時代から活躍していた。',a:true},
+  {type:'4',q:'なにわ男子のメンバーで最年長は誰か？',c:['藤原丈一郎','大橋和也','西畑大吾','高橋恭平'],a:0},
+  {type:'ox',q:'なにわ男子は2021年に CDデビューした。',a:true},
+  {type:'4',q:'なにわ男子が出演したドラマ「花のち晴れ」で主演を務めたメンバーは誰か？',c:['道枝駿佑','大橋和也','西畑大吾','長尾謙杜'],a:0},
+  {type:'ox',q:'なにわ男子の「初心LOVE」はフジテレビ系ドラマの主題歌だった。',a:true},
+  {type:'4',q:'なにわ男子の小島健が得意とすることはどれか？',c:['バック転などのアクロバット','料理','英語','書道'],a:0},
+  {type:'ox',q:'高橋恭平はバラエティでの明るいキャラクターで人気がある。',a:true},
+  {type:'4',q:'なにわ男子の「ハッピーサプライズ」はどんな楽曲か？',c:['明るくポップな楽曲','哀愁バラード','ロック調','R&B'],a:0},
+  {type:'ox',q:'大橋和也はミュージカルへの出演経験もある。',a:true},
+  {type:'4',q:'なにわ男子のメンバーで最年少は誰か？',c:['長尾謙杜','小島健','道枝駿佑','高橋恭平'],a:0},
+  {type:'ox',q:'なにわ男子は関西を拠点とした活動が多い。',a:true},
+  {type:'4',q:'なにわ男子の「恋人ごっこ」はどんな内容の楽曲か？',c:['恋愛をテーマにした甘いラブソング','友情をテーマにした曲','卒業をテーマにした曲','夏をテーマにした曲'],a:0},
+  {type:'ox',q:'西畑大吾は関ジャニ∞のメンバーではない。',a:true},
+  {type:'4',q:'なにわ男子のファンクラブ名は何か？',c:['なにふぁむ','なにファン','なにわファミリー','なにわっ子'],a:0},
+  {type:'ox',q:'藤原丈一郎はお笑いが好きで、バラエティでも活躍している。',a:true},
+  {type:'4',q:'なにわ男子がレギュラー出演するテレビ番組の傾向はどれか？',c:['バラエティ・情報番組が多い','料理番組が多い','ドキュメンタリーが多い','旅番組が多い'],a:0},
+  {type:'ox',q:'なにわ男子は「少年たち」などのジャニーズ舞台に出演したことがある。',a:true},
+  {type:'4',q:'道枝駿佑が出演したドラマで特に話題になったのはどれか？',c:['花のち晴れ〜花男 Next Season〜','グランメゾン東京','ラストマン','下剋上球児'],a:0},
+  {type:'ox',q:'なにわ男子のメンバーは全員が大阪出身だ。',a:false},
+  {type:'4',q:'なにわ男子の「夢陸」はどんな楽曲か？',c:['夢に向かって突き進むメッセージソング','失恋を歌ったバラード','夏をテーマにした楽曲','コメディタッチの楽曲'],a:0},
+  {type:'ox',q:'なにわ男子はデビュー前からドームコンサートに出演していた。',a:true},
+  {type:'4',q:'長尾謙杜の愛称として知られるのはどれか？',c:['ながお','けんと','けんちゃん','ながちゃん'],a:1},
+],
+travis:[
+  {type:'4',q:'Travis Japanは何人組のグループか？',c:['7人','6人','5人','8人'],a:0},
+  {type:'ox',q:'Travis Japanはアメリカでのデビューも果たしている。',a:true},
+  {type:'4',q:'Travis Japanのデビューシングルはどれか？',c:['JUST DANCE!','PARTY MANIACS','Candy Kiss','Move the soul'],a:0},
+  {type:'ox',q:'Travis Japanは2022年に国際的なデビューを果たした。',a:true},
+  {type:'4',q:'Travis Japanのメンバーで最年長は誰か？',c:['七五三掛龍也','吉澤閑也','宮近海斗','川島如恵留'],a:0},
+  {type:'ox',q:'川島如恵留は高学歴でクイズ番組にも出演している。',a:true},
+  {type:'4',q:'Travis Japanのダンスの特徴として最も知られるのはどれか？',c:['高い技術のダンスパフォーマンス','アクロバット','武道的な動き','日本舞踊'],a:0},
+  {type:'ox',q:'Travis Japanはジャニーズ事務所所属のグループだ。',a:true},
+  {type:'4',q:'Travis Japanのメンバー中村海人の特技はどれか？',c:['イラストを描くこと','料理','書道','英語'],a:0},
+  {type:'ox',q:'Travis Japanは「少年たち」などのジャニーズ舞台で活躍した経験がある。',a:true},
+  {type:'4',q:'吉澤閑也の愛称はどれか？',c:['よっしー','しずや','かんや','よし'],a:0},
+  {type:'ox',q:'Travis Japanはアメリカで英語でのシングルをリリースした。',a:true},
+  {type:'4',q:'Travis Japanで「ちゃか」と呼ばれるメンバーは誰か？',c:['宮近海斗','松田元太','七五三掛龍也','川島如恵留'],a:0},
+  {type:'ox',q:'松倉海斗はグループの中で最年少メンバーだ。',a:false},
+  {type:'4',q:'Travis Japanが特に得意とするパフォーマンスはどれか？',c:['ダンス・ボーカルの融合','コント・お笑い','楽器演奏','アクロバット披露'],a:0},
+  {type:'ox',q:'Travis Japanの「PARTY MANIACS」はアップテンポなダンスナンバーだ。',a:true},
+  {type:'4',q:'七五三掛龍也の読み方はどれか？',c:['しめかけりゅうや','ひちごさんかけりゅうや','しちごさんかけりゅうや','ななごみかけりゅうや'],a:0},
+  {type:'ox',q:'Travis Japanはデビュー前にYouTubeで積極的に動画を配信していた。',a:true},
+  {type:'4',q:'Travis Japanがアメリカでデビューした際にタッグを組んだレーベルはどれか？',c:['Universal Music','Sony Music','Warner Music','Capitol Records'],a:0},
+  {type:'ox',q:'川島如恵留は早稲田大学出身だ。',a:true},
+  {type:'4',q:'Travis Japanで最も長くJr.を経験したメンバーは誰か？',c:['七五三掛龍也','松田元太','宮近海斗','吉澤閑也'],a:0},
+  {type:'ox',q:'Travis Japanは日本だけでなく海外のファンも多い。',a:true},
+  {type:'4',q:'Travis Japanの「Move the soul」はどんな楽曲か？',c:['ソウルフルなミディアムナンバー','ヘビーロック','コミカルソング','民謡調'],a:0},
+  {type:'ox',q:'松田元太はグループの中でもムードメーカー的な役割を担っている。',a:true},
+  {type:'4',q:'Travis Japanのグループ名の由来に関係する人物は誰か？',c:['タッキー（滝沢秀明）','ジャニー喜多川','東山紀之','木村拓哉'],a:0},
+],
+};
+
+let currentGenre=null,questions=[],qIndex=0,score=0,correctCount=0,wrongCount=0;
+let timeLeft=120,timer=null,answered=false,wrongAnswers=[],playerName='';
+let currentRankingGenre=null;
+
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo(0,0);}
+function showToast(msg,d=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
+
+function buildGenreCards(){
+  const grid=document.getElementById('genres-grid');
+  grid.innerHTML=GENRES.map(g=>`
+    <div class="genre-card" onclick="selectGenre('${g.id}')">
+      <div class="genre-accent" style="background:${g.color};"></div>
+      <span class="genre-icon">${g.icon}</span>
+      <div class="genre-name">${g.name}</div>
+      <div class="genre-member">${g.members}</div>
+      <div class="genre-count">全${DB[g.id].length}問収録 ／ 10問ランダム出題</div>
+      <span class="genre-start">▶ START</span>
+    </div>`).join('');
+}
+
+function selectGenre(id){
+  currentGenre=GENRES.find(g=>g.id===id);
+  document.getElementById('intro-icon').textContent=currentGenre.icon;
+  document.getElementById('intro-name').textContent=currentGenre.name;
+  document.getElementById('intro-members').textContent=currentGenre.members;
+  if(window.TomyStamp){const saved=TomyStamp.getPlayer();const inp=document.getElementById('name-input');if(saved&&!inp.value)inp.value=saved;}
+  showScreen('screen-intro');
+}
+
+function startGame(){
+  playerName=document.getElementById('name-input').value.trim()||'ゲスト';
+  if(window.TomyStamp&&playerName!=='ゲスト')TomyStamp.setPlayer(playerName);
+  questions=shuffle(DB[currentGenre.id]).slice(0,10);
+  qIndex=0;score=0;correctCount=0;wrongCount=0;wrongAnswers=[];
+  showScreen('screen-quiz');showQuestion();startTimer();
+}
+function retryGame(){showScreen('screen-intro');}
+
+function startTimer(){
+  clearInterval(timer);timeLeft=120;updateTimerDisplay();
+  timer=setInterval(()=>{timeLeft--;updateTimerDisplay();if(timeLeft<=0){clearInterval(timer);endGame();}},1000);
+}
+function updateTimerDisplay(){
+  const el=document.getElementById('quiz-timer');
+  el.textContent=timeLeft;
+  el.className='quiz-timer'+(timeLeft<=10?' danger':'');
+}
+
+function showQuestion(){
+  const q=questions[qIndex];answered=false;
+  document.getElementById('quiz-qnum').textContent=`Q${qIndex+1} / 10`;
+  document.getElementById('quiz-progress-fill').style.width=`${(qIndex/10)*100}%`;
+  document.getElementById('quiz-score').textContent=`${score} pt`;
+  document.getElementById('feedback-bar').className='feedback-bar';
+  document.getElementById('feedback-bar').textContent='';
+  document.getElementById('next-btn').className='next-btn';
+  if(q.type==='4'){
+    document.getElementById('quiz-type-badge').textContent='4択';
+    document.getElementById('quiz-type-badge').className='quiz-type-badge type-4';
+    document.getElementById('quiz-q').textContent=q.q;
+    const labels=['A','B','C','D'];
+    document.getElementById('quiz-choices').innerHTML=q.c.map((c,i)=>
+      `<button class="choice-btn" onclick="answer4(${i})"><span class="choice-label">${labels[i]}</span>${c}</button>`
+    ).join('');
+  }else{
+    document.getElementById('quiz-type-badge').textContent='○×';
+    document.getElementById('quiz-type-badge').className='quiz-type-badge type-ox';
+    document.getElementById('quiz-q').textContent=q.q;
+    document.getElementById('quiz-choices').innerHTML=`<div class="ox-choices">
+      <button class="ox-btn" onclick="answerOX(true)">⭕<span>正しい</span></button>
+      <button class="ox-btn" onclick="answerOX(false)">❌<span>誤り</span></button>
+    </div>`;
+  }
+}
+
+function answer4(idx){
+  if(answered)return;answered=true;
+  const q=questions[qIndex];
+  const btns=document.querySelectorAll('.choice-btn');
+  btns.forEach(b=>b.disabled=true);
+  btns[q.a].classList.add('correct');
+  if(idx!==q.a)btns[idx].classList.add('wrong');
+  processAnswer(idx===q.a,q.c[q.a],q.q);
+}
+function answerOX(val){
+  if(answered)return;answered=true;
+  const q=questions[qIndex];
+  const btns=document.querySelectorAll('.ox-btn');
+  btns.forEach(b=>b.disabled=true);
+  btns[q.a?0:1].classList.add('correct');
+  if(val!==q.a)btns[val?0:1].classList.add('wrong');
+  processAnswer(val===q.a,q.a?'○（正しい）':'×（誤り）',q.q);
+}
+
+function processAnswer(isCorrect,correctAns,qText){
+  const fb=document.getElementById('feedback-bar');
+  if(isCorrect){
+    score+=10;correctCount++;timeLeft=Math.min(timeLeft+5,999);
+    fb.textContent='✅ 正解！ ＋5秒';fb.className='feedback-bar ok show';
+  }else{
+    wrongCount++;timeLeft=Math.max(timeLeft-5,0);
+    fb.textContent=`❌ 正解は「${correctAns}」（−5秒）`;fb.className='feedback-bar ng show';
+    wrongAnswers.push({q:qText,a:correctAns});
+  }
+  updateTimerDisplay();
+  document.getElementById('next-btn').className='next-btn show';
+}
+
+function nextQuestion(){qIndex++;if(qIndex>=10){clearInterval(timer);endGame();}else{showQuestion();}}
+
+function endGame(){
+  clearInterval(timer);
+  const bonus=Math.max(timeLeft,0),total=score+bonus;
+  const medal=correctCount>=9?'🥇':correctCount>=7?'🥈':correctCount>=5?'🥉':'😅';
+  document.getElementById('result-genre').textContent=currentGenre.icon+' '+currentGenre.name;
+  document.getElementById('result-score').textContent=total;
+  document.getElementById('result-medal').textContent=medal;
+  document.getElementById('result-correct').textContent=correctCount;
+  document.getElementById('result-wrong').textContent=wrongCount;
+  document.getElementById('result-bonus').textContent='+'+bonus;
+
+  const ws=document.getElementById('wrong-section');
+  if(wrongAnswers.length>0){
+    ws.innerHTML=`<div class="wrong-label">// ❌ 間違えた問題（${wrongAnswers.length}問）</div>`+
+      wrongAnswers.map((w,i)=>`<div class="wrong-item">
+        <div class="wrong-item-num">問${i+1}</div>
+        <div class="wrong-item-q">${w.q}</div>
+        <div class="wrong-item-ans"><span class="wrong-item-ans-label">正解</span><span class="wrong-item-ans-text">${w.a}</span></div>
+      </div>`).join('');
+  }else{
+    ws.innerHTML='<div style="text-align:center;padding:20px;font-family:\'Share Tech Mono\',monospace;font-size:12px;color:var(--purple3);">🎉 全問正解！</div>';
+  }
+
+  saveRanking(currentGenre.id,playerName,total,correctCount);
+  if(window.TomyStamp&&playerName!=='ゲスト'){
+    TomyStamp.send('geino-quiz',currentGenre.name,correctCount).then(r=>{
+      if(r.ok)showToast('⭐ スタンプ獲得！ランキングに反映されます');
+    });
+  }
+  showScreen('screen-result');
+}
+
+const LS_KEY='geino_quiz_ranking';
+function saveRanking(gId,name,sc,correct){
+  const data=JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+  if(!data[gId])data[gId]=[];
+  data[gId].push({name,score:sc,correct,date:new Date().toLocaleDateString('ja-JP')});
+  data[gId].sort((a,b)=>b.score-a.score);
+  data[gId]=data[gId].slice(0,20);
+  localStorage.setItem(LS_KEY,JSON.stringify(data));
+}
+
+function showRanking(){
+  const tabs=document.getElementById('ranking-tabs');
+  tabs.innerHTML=GENRES.map(g=>`<button class="ranking-tab" onclick="switchRankingTab('${g.id}',this)">${g.icon} ${g.name}</button>`).join('');
+  showScreen('screen-ranking');
+  switchRankingTab(GENRES[0].id,tabs.querySelector('.ranking-tab'));
+}
+function switchRankingTab(id,btn){
+  document.querySelectorAll('.ranking-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  currentRankingGenre=id;
+  renderRanking(id);
+}
+function renderRanking(id){
+  const data=JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+  const rows=data[id]||[];
+  const list=document.getElementById('ranking-list');
+  if(!rows.length){list.innerHTML='<div class="ranking-empty">// まだ記録がありません</div>';return;}
+  list.innerHTML=rows.map((r,i)=>{
+    const pos=i+1,pc=pos===1?'gold':pos===2?'silver':pos===3?'bronze':'';
+    const rc=pos===1?'top1':pos===2?'top2':pos===3?'top3':'';
+    return `<div class="ranking-row ${rc}">
+      <span class="ranking-pos ${pc}">${pos}</span>
+      <span class="ranking-name">${r.name}</span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text3);">${r.correct}/10</span>
+      <span class="ranking-score">${r.score}</span>
+      <span class="ranking-date">${r.date}</span>
+    </div>`;
+  }).join('');
+}
+function deleteRanking(){
+  if(!currentRankingGenre)return;
+  if(!confirm(`「${GENRES.find(g=>g.id===currentRankingGenre)?.name}」の記録を削除しますか？`))return;
+  const data=JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+  delete data[currentRankingGenre];
+  localStorage.setItem(LS_KEY,JSON.stringify(data));
+  renderRanking(currentRankingGenre);
+}
+
+buildGenreCards();
+</script>
+</body>
+</html>
